@@ -1,13 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
-import pydantic
-
-# Compatibility helper for Pydantic v1/v2
-if pydantic.__version__.startswith('2'):
-    model_config = {'from_attributes': True}
-else:
-    model_config = {'orm_mode': True}
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -29,9 +22,7 @@ class UserOut(BaseModel):
     is_pro: bool
     created_at: datetime
     class Config:
-        orm_mode = True
-    # For v2 compatibility (ignored in v1)
-    model_config = model_config
+        from_attributes = True
 
 class LinkCreate(BaseModel):
     url: str
@@ -44,8 +35,7 @@ class LinkOut(BaseModel):
     clicks: int
     created_at: datetime
     class Config:
-        orm_mode = True
-    model_config = model_config
+        from_attributes = True
 
 class LinkDetail(LinkOut):
     short_url: str
