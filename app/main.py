@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 import models
 from database import engine, get_db
@@ -10,31 +11,28 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="LinkForge API", version="1.0.0")
 
-# CORS: allow your Vercel domain (update after deployment)
-origins = [
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
-    "https://your-project.vercel.app",   # replace with actual Vercel URL
-    "null"
-]
-
+# CORS: allow all origins for simplicity (you can restrict later)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Mount static files (frontend)
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
+
+# Include API routers
 app.include_router(auth.router)
 app.include_router(links.router)
 app.include_router(billing.router)
 
 @app.get("/")
-def root():
-    return {"name": "LinkForge API", "status": "running"}
+def serve_frontend():
+    from fastapi.responses import FileResponse
+    return FileResponse("static/index.html")
 
-# Catch-all redirection (works only for API domain; frontend handles its own)
 @app.get("/{slug}")
 def redirect_to_url(slug: str, db: Session = Depends(get_db)):
     link = db.query(models.Link).filter(models.Link.slug == slug).first()
