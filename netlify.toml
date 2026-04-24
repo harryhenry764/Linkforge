@@ -7,24 +7,25 @@
   external_node_modules = []
   node_bundler = "none"
 
+# API and dynamic pages → send to function AS-IS (keep original path)
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
+  to = "/.netlify/functions/api"
   status = 200
 
 [[redirects]]
   from = "/docs"
-  to = "/.netlify/functions/api/docs"
+  to = "/.netlify/functions/api"
   status = 200
 
 [[redirects]]
   from = "/openapi.json"
-  to = "/.netlify/functions/api/openapi.json"
+  to = "/.netlify/functions/api"
   status = 200
 
-# Catch-all for short link redirection (must be last)
+# Catch-all for short link redirection (only if static file not found)
 [[redirects]]
   from = "/*"
-  to = "/.netlify/functions/api/:splat"
+  to = "/.netlify/functions/api"
   status = 200
-  force = false  # only if file not found
+  force = false
